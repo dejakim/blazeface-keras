@@ -1,5 +1,5 @@
 # Dataset preparation
-I used [Caltech 10,000 Web Faces](http://www.vision.caltech.edu/Image_Datasets/Caltech_10K_WebFaces/) to train BlazeFace model.
+I used [Caltech 10,000 Web Faces](http://www.vision.caltech.edu/Image_Datasets/Caltech_10K_WebFaces/) to train this model.
 
 To save training time, all images and ground truths are zipped in one blob file in this directory.
 

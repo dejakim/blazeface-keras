@@ -1,6 +1,8 @@
 '''
 prepare.py
 Author: Daewung Kim (skywalker.deja@gmail.com)
+
+Usage: python prepare.py
 '''
 from __future__ import print_function
 
@@ -10,7 +12,6 @@ import numpy as np
 import cv2
 import pickle
 import gzip
-import json
 import random
 from tqdm import tqdm
 
@@ -25,7 +26,8 @@ def load_webfaces(path):
     path (str) : A path where the Caltech Web Fases dataset decompressed
   
   Returns:
-    2-D list : A list of [image path (str), ground truth boxes (2-D list)]
+    list : A list of image path (str), ground truth boxes (2-D list) pair
+           each box can be parsed as left, top, right, bottom (0 ~ 1.0)
   
   '''
   print("loading caltech web faces data set...")
@@ -66,7 +68,8 @@ def load_webfaces(path):
   return data
 
 if __name__ == '__main__':
-  bin_path = './data/faces_encoded.pickle'
+  bin_path = './data/faces_raw.pickle'
+  enc_path = './data/faces_encoded.pickle'
 
   print('-'*30)
   print('load meta data')
@@ -77,7 +80,7 @@ if __name__ == '__main__':
 
   print('-'*30)
   print('load image and annotation')
-  x_data, y_data = [], []
+  x_data, y_data, y_data_enc = [], [], []
   for i in tqdm(range(len(data))):
     img_path, obj_boxes = data[i]
     # image
@@ -100,29 +103,34 @@ if __name__ == '__main__':
         y.append(box)
     if not y:
       continue
-    y = ground_truth(y, def_boxes, def_boxes_rect)
+    y_enc = ground_truth(y, def_boxes, def_boxes_rect)
     
     # resize and crop original image
     x = cv2.resize(img[oy:oy+ow, ox:ox+ow], (W,W))
 
     # if i < 30:
-    #   draw(x, y, def_boxes)#debug(x, y)
+    #   debug(x, y)
+    #   draw(x, y_enc, def_boxes)
     # else:
     #   exit("Quit")
 
     # add image and ground truth
     x_data.append(x)
     y_data.append(y)
+    y_data_enc.append(y_enc)
   
   x_data = np.array(x_data)
   y_data = np.array(y_data)
-  print(x_data.shape, y_data.shape)
+  y_data_enc = np.array(y_data_enc, dtype=np.float32)
+  print(x_data.shape, y_data.shape, y_data_enc.shape)
 
   print('-'*30)
   print('save to file')
-  # save to file
+  # save raw blob
   with gzip.open(bin_path, 'wb') as f:
     pickle.dump({ "x_data":x_data, "y_data":y_data }, f)
-    print('file saved')
+  # save encode blob
+  with gzip.open(enc_path, 'wb') as f:
+    pickle.dump({ "x_data":x_data, "y_data":y_data_enc }, f)
   
   print('done')

@@ -18,7 +18,7 @@ pi_4 = np.pi * .25
 
 class DataGenerator(tf.keras.utils.Sequence):
   def __init__(self, images, labels, batch_size=16, shuffle=True, random_state=33):
-    'Initialization'
+    '''Initialization'''
     self.images = images
     self.labels = labels
     self.batch_size = batch_size
@@ -42,7 +42,7 @@ class DataGenerator(tf.keras.utils.Sequence):
     return self.__data_generation(indexes)
 
   def on_epoch_end(self):
-    'Updates indexes after each epoch'
+    '''Updates indexes after each epoch'''
     self.indexes = np.arange(len(self.images))
     if self.shuffle == True:
       np.random.seed(self.random_state)
